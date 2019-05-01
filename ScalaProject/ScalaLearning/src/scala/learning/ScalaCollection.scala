@@ -1,4 +1,4 @@
-package scala.com.scala.project
+package scala.learning
 
 
 import scala.collection.mutable._
