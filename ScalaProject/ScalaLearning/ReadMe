@@ -1,0 +1,7 @@
+This is how to run the Spark 2 in Windows 
+Down load the windows - winutils.exe 
+Set the HADOOP_HOME 
+Make usre your scala-library , spark-core_2.11 ,spark-sql_2.11 are same to work properly , In my example I have used  - 2.11.11 for scala-library and maven version as - 2.4.0 for spark-core_2.11 ,spark-sql_2.11
+
+
+
