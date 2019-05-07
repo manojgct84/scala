@@ -1,9 +1,9 @@
 package scala.project
 
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.types.{IntegerType, StringType, StructField, StructType}
-import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 import org.apache.spark.sql.functions._
+import org.apache.spark.sql.types.{IntegerType, StringType, StructField, StructType}
+import org.apache.spark.sql.{DataFrame, SparkSession}
 
 object SparkSQL {
 
@@ -121,6 +121,19 @@ object SparkSQL {
 
 		//Returns a new DataFrame by adding a column or replacing the existing column that has the same name.
 
+		var coder: (Int => String) = (args: Int) => {
+			if (args < 300) "slow" else "high"
+		}
+
+		val sqlfun = udf(coder)
+
+		carsDF.withColumn("First", sqlfun(col("speed"))).show()
+
+		//Returns a new DataFrame with a column renamed.
+		carsDF.withColumnRenamed("speed", "super_Speed").show()
+
+		//describe returns a DataFrame containing information such as number of non-null entries (count),mean, standard deviation, and minimum and maximum value for each numerical column.
+		carsDF.describe("speed").show()
 
 	}
 }
