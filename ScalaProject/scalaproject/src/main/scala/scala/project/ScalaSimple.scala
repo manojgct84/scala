@@ -1,12 +1,16 @@
-import org.apache.spark.api.java.function.ForeachFunction
-import org.apache.spark.sql.{Row, SparkSession}
+import com.mongodb.client.FindIterable
+import com.mongodb.{Block, MongoClient, client}
+import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.types._
+import org.bson
+import org.mongodb.scala.bson.collection.immutable.Document
 
 /**
 	* @Author : Manojkumar M
 	*
 	*/
 object ScalaSimple {
+
 
 	def main(args: Array[String]): Unit = {
 
@@ -56,14 +60,69 @@ object ScalaSimple {
 
 		val rddData = sparkSession.sparkContext.textFile("src/main/resources/data.txt")
 
-		val count = rddData.countByValue();
+		val count = rddData.countByValue()
 
-		rddData.foreach(items => println("Print the value  %s".format(items)))
+		rddData.foreach(items => println("On desk Print the value  %s".format(items)))
+
+		//Rwo memory cache proess
+		//rddData.persist(org.apache.spark.storage.StorageLevel.MEMORY_ONLY)
+
+		//	rddData.foreach(items => println("On Cache Print the value  %s".format(items)))
+
+		val filderRDD = rddData.filter { x => !x.contains("manojkumar") }
+
+
+		val rows = rddData.flatMap(line => line.split(" "))
+
+		println("Flat Map  %s".format(rows.collect()))
+
+		filderRDD.foreach(itm => println("filtered value %s".format(itm)))
 
 		sqlDF.foreach(rows => println("This is data frame printing : %s".format(rows)))
+
+		val dataFrame = sqlDF.select("transactionId", "customerId")
+
+		dataFrame.show()
+
+		dataFrame.createTempView("dataFrame")
+
+		val selected = sparkSession.sqlContext.sql("select * from dataFrame")
+
+		selected.show()
+
+		//println("Mongo Driver info : ", new MongoDriverInformation().getDriverNames())
+
+		val mongoClient: MongoClient = new MongoClient("localhost", 27017)
+
+		val database: client.MongoDatabase = mongoClient.getDatabase("admin")
+
+		val collection = database.getCollection("Employee")
+
+		val findIterable = collection.find()
+
+
+		/*		val connectionProperties = new Properties()
+				connectionProperties.put("driver", "mongodb.jdbc.MongoDriver")
+				connectionProperties.put("user", "mongodb")
+				connectionProperties.put("password", "mongodb")
+				val mongoDB = sparkSession.read.jdbc("jdbc:mongodb://Deepa:27017/admin.Employee", "admin.Employee", connectionProperties)
+				mongoDB.show()*/
+
+
+		/*Class.forName("mongodb.jdbc.MongoDriver")
+		val URL = "jdbc:mongo://Deepa:27017/admin"
+		val jdbcConn = DriverManager.getConnection(URL, "mongodb", "mongodb")
+
+		jdbcConn.prepareCall("select * From Employee")*/
 
 		println("The count by value using RDD %s".format(count))
 
 
 	}
+
+	def func(findIterable: FindIterable[bson.Document]) = {
+
+
+	}
+
 }
